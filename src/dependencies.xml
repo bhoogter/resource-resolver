@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-
-<modules>
-    <module>
-        <dependencies>
-            <dependency group="bhoogter" name="xml-file" version="0.2.70" />
-        </dependencies>
-    </module>
-</modules>
