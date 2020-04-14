@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+cd $(dirname $0)
+
+testFile() {
+	php ../phpunit-6.5.14.phar --bootstrap src/stub.php $1
+}
+
+if [[ "$1" == "" ]]; then
+	for f in tests/*test.php; do
+		echo "test: $f"
+		testFile $f
+	done
+else
+	testFile $1
+fi

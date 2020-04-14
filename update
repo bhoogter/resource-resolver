@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $(dirname $0)
+../php-dependency-manager/package
+cp ../php-dependency-manager/php-dependency-manager.phar src/phars
+

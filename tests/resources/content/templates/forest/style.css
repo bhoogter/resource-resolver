@@ -1,0 +1,339 @@
+bac/* global */
+html
+{ height: 100%;}
+
+*
+{ margin: 0;
+  padding: 0;}content
+  
+
+body
+{ font: normal .80em arial, sans-serif;
+  background: #FBFBFB;
+  color: #5D5D5D;}
+
+p
+{ padding: 0 0 20px 0;
+  line-height: 1.7em;}
+
+a, a:hover
+{ text-decroration: none; }
+
+h1, h2, h3, h4, h5, h6 
+{ 
+  font: normal 100% arial, 'lucida sans unicode', sans-serif;
+  color: #43423F;
+  margin: 0px 0px 2px 0px;
+  padding: 0px 0px 0px 0px;
+
+}
+
+h1
+{
+  height: 20px;
+  padding: 0px 0px 0px 0px;
+  background-color: rgb(200, 200, 160);
+  font-weight: bold;
+  font-size: 110%;
+  border-top: solid;
+  border-width: 2px;
+  border-color: black;
+}
+
+h2
+{ 
+  height: 19px;
+  line-height: 0px;
+  font: bold 90% 'lucida sans unicode', arial,  sans-serif; 
+  background-color: rgb(160, 160, 135); 
+  padding: 0px 0px 0px 0px;
+  padding-left: 15px;
+}
+
+h3
+{
+  color: #CC8080;
+  height: 20px;
+  font: normal 90% 'lucida sans unicode', arial, sans-serif;
+  padding-left: 15px;
+}
+
+h4, h5, h6
+{ margin: 0px 0px 0px 0px;
+  padding: 0px 0px 5px 0px;
+  font: normal 55% arial, sans-serif;
+  color: #7D80FF;;
+  line-height: 1.5em;}
+
+h5, h6
+{ font: italic 95% arial, sans-serif;
+  color: #888;
+  padding-bottom: 15px;}
+
+h6
+{ color: #362C20;}
+
+img{border: 0px;}
+
+/* image positioning - left, right and center */
+.left
+{ float: left; 
+  padding: 0px 8px 0px 0px;
+}
+
+.right
+{ float: right; 
+  padding: 0px 0px 0px 8px;
+}
+
+.center
+{ display: block;
+  text-align: center;
+  margin: 0 auto;
+}
+
+/* block quote */
+blockquote
+{ margin: 20px 0px 20px 0px; 
+  padding: 10px 20px 0px 20px;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+}
+
+/* unordered list */
+ul
+{ margin: 0px 0px 0px 14px;
+  padding: 0px;
+}
+
+#site_content
+{ width: 980px;
+  overflow: hidden;
+  margin: 0 auto 0 auto;
+  padding: 5px 0;} 
+
+#sidebar
+{ font-family: Tahoma;
+  font-size: 14px;
+  float: right;
+  width: 258px;
+  margin: 0px 0px 0px 0px;
+  padding: 0 20px 0 20px;
+}
+
+#sidebar ul
+{ width: 228px; 
+  padding: 4px 0 0 0; 
+  margin: 4px 0 30px 0;}
+
+#sidebar li
+{ list-style: none; 
+  padding: 0 0 7px 0; }
+
+#sidebar li a, #sidebar li a:hover
+{ padding: 0 0 0 25px;
+  display: block;
+  background: transparent url(images/link.png) no-repeat left center;} 
+
+#sidebar li a.selected
+{ color: #444;} 
+
+#content
+{ float: left;
+  text-align: left;
+  font-family: tahoma;
+  font-size: 14px;
+  width: 633px;
+  margin: 0px 0px 0px 0px;
+  padding: 0 20px 0 20px;
+}
+
+#pic-right
+{ float: left;
+  text-align: left;
+  font-family: tahoma;
+  font-size: 14px;
+  width: 10px;
+  height: 10px;
+  background-color: black;
+  margin: 0px 0px 0px 0px;
+  padding: 0 00px 0 20px;
+}
+
+/* main container */
+#main
+{ width: 1000px;
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+/* links above the logo */
+#links
+{ background: url(images/links.png) repeat;
+  margin: 5px auto 0 auto;
+  padding: 17px 0px 6px 0px;
+  width: 980px;
+  text-align: center;
+  height: 27px;
+  border: 0px solid;
+}
+
+#links a
+{ text-decoration: none;}
+#links a:hover
+{text-decoration: underline;}
+
+
+/* logo */
+#logo
+{ padding: 0px;
+  width: 980px;
+  height: 100px;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  text-align: left;
+  margin-left: auto; 
+  margin-right: auto;
+}
+
+#logo h1
+{ padding: 26px 0px 0px 20px;
+  font-family: "times new roman";
+  font-size: 30px;
+  font-weight: bold;
+  letter-spacing: .3em;
+  display: block;
+  position: absolute;
+
+}
+
+ul#g-nav-main
+{ padding: 0;margin: 0px;}
+
+ul li
+{ list-style-type: circle;
+  margin: 0px 0px 6px 5px; 
+  padding: 0px;
+}
+
+ul#g-nav-main li
+{ float: left; 
+  margin: 0px 0px 0px 0px; 
+  padding: 0px;
+  list-style: none;
+} 
+
+ul#g-nav-main li a 
+{ font-size: 13px;
+  font-family: tahoma;
+  text-align: center;
+  display: block; 
+  float: left; 
+  height: 24px;
+  text-decoration: none; 
+  padding: 0px 0px 0px 0px;
+  width: 80px;
+  background: transparent;
+} 
+
+#sidebaritem
+{ position: relative;
+  text-align: justify;
+  margin: 8px 0px 22px 0px;
+  padding: 8px 8px 11px 4px;
+  width: 167px;
+  float: left;
+}
+
+#sidebaritem a, #column2 a
+{ padding: 0px 0px 0px 11px;
+  text-decoration: none;
+}
+
+#sidebaritem a:hover, #column2 a:hover
+{ padding: 0px 0px 0px 11px;
+  text-decoration: none;
+}
+
+/* footer */
+#footer
+{ background: url(images/footer.png) repeat;
+  padding: 14px 0px 0px 0px;
+  width: 980px;
+  text-align: center;
+  height: 36px;
+  font-family: tahoma;
+  font-size: 16px;
+  margin: 5px auto 0px auto;
+  overflow: hidden;
+  border-style: none;;
+}
+
+#footer a{text-decoration: none;}
+#footer a:hover{text-decoration: underline;}
+
+/* contact page - form layout */
+form{margin-top: 0px;}
+
+div.row
+{ clear: both;
+  width: 448px;
+}
+
+div.row span.formlabel 
+{ float: left;
+  width: 150px;
+  text-align: left;
+}
+
+div.row span.forminput
+{ float: right;
+  text-align: right;
+} 
+
+div.spacer
+{ clear: both;
+  width: 80px;
+}
+
+input, textarea
+{ width: 259px; 
+  font-family: verdana, arial, sans-serif;
+  font-size: 100%;
+  border: 1px solid;
+  margin: 2px;
+}
+
+.submit
+{ font-family: verdana, arial, sans-serif;
+  font-size: 100%; 
+  border: 1px solid;
+  width: 70px;
+  height: 22px;
+  cursor: pointer;
+}
+
+#site_content * table
+{
+padding: 0px 0px 0px 0px;
+margin: 0px 0px 0px 0px;
+}
+
+#site_content * th
+{
+font-weight: bold;
+font-style: normal;
+font-size: 11px;
+}
+#site_content * td
+{
+font-size: 10px;
+border-collapse: collapse;
+border: solid 1px gray;
+}
+#site_content * td.form-caption
+{
+font-weight: bold;
+text-align: right;
+padding-right: 5px;
+}

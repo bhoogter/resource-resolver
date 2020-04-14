@@ -1,0 +1,108 @@
+html{height: 100%;}
+
+body
+{ background: url(images/background.png) repeat;
+  color: #5F564F;
+}
+
+blockquote
+{ background-color: #F6F3F0;
+  color: #5F564F;
+  border-color: #DFD8D3;
+}
+
+h1
+{ background: transparent;
+  color: #538200;
+}
+
+h2
+{ background: transparent;
+  color: #71B200;
+}
+
+h3
+{ background: transparent;
+  color: #71B200;
+}
+
+#main
+{
+  background: #FFF;
+  color: #5F564F;
+}
+
+#links
+{ color: #5F564F;
+  border-color: #000;
+  
+}
+
+#footer
+{ color: #5F564F;
+  border-color: #54504F;
+}
+
+#links a, #links a:hover, #footer a, #footer a:hover
+{ background-color: transparent;
+  color: #5F564F;
+}
+
+#logo
+{ xbackground: url(images/logo.jpg);
+  color: #5F564F;
+  border-style: none;
+}
+
+#logo h1
+{ background-color: transparent;
+  color: #FFFFFF;
+}  
+
+#content
+{ background-color: #FFFFFF;
+  color: #5F564F;
+  border-color: #54504F;
+} 
+
+#column2
+{ background-color: #FFFFFF;
+  color: #5F564F;
+} 
+
+#column1
+{ background: #FFFFFF url(images/back_3.png) repeat;
+  color: #5F564F;
+}
+
+#g-nav-main, #addlinks, .sidebaritem
+{ background: transparent;
+  color: #5F564F;
+}
+
+#g-nav-main li a, #addlinks li a, .sidebaritem a, #column2 a
+{ ;
+  color: #5F564F;
+}
+
+#g-nav-main li a:hover, #menu li a#selected, #addlinks li a:hover, .sidebaritem a:hover, #column2 a:hover
+{ 
+  color: #5F564F;
+} 
+
+#g-nav-main li a 
+{
+  color: #000;
+}
+
+input, textarea
+{ background-color: #FFFFFF;
+  color: #5F564F;
+  border-color: #AEA5A2;
+}
+
+a
+{
+color: #404080;
+text-decoration: none;
+}

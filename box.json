@@ -1,0 +1,10 @@
+{
+  "files": [
+    "README.md",
+    "VERSION",
+    "LICENSE"
+  ],
+  "directories" : [ "src" ],
+  "stub": "src/stub.php",
+  "output": "resource-resolver.phar"
+}
