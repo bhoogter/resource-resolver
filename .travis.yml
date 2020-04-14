@@ -15,8 +15,10 @@ before_deploy:
 - php box.phar build
 deploy:
   provider: releases
+  skip_cleanup: true
+  file: resource-resolver.phar
   api_key:
     secure: n4VZERMzP8fxQni4dkvp728XX+vqaLpoe6S0qmEG6FIQQVsRDjiJx0mG9kjjGmaUcpPHmabXNpSdX3wIDzjxD6vzZLAyWjlJvc1ftTCjFbRiUaOsMI8PD/KVQQuIjhK6avv5jdKaYE1GoG2EIWOF/wpafePF8eBWgL7updrPlKWucuowNK634ATVYG3KoFOua+133eVsr8lSP6PXyxBLzF8OX/eRqQ437xwEywW3gzeE4wsgOsSwmr0/div5Ea8bb5Alk+eQg64Cwu4vshX2YWyAobwaXClELXLSlkQ13PpcyNfycKPKqu4gyIM4zFhYjaVbMVOQ976JRArSMGFSCYokR9vuObZGfW9KyTTshdqXH6PGzX/Is5h1MtMeP9FDtbcsEdnlvbJMMWB/IkCxZrA/HZal4JZ9lBpjndb5PgAu7DdAyfO3qe4dOE/PvnqIiNOpkL2lwpi07I65dLS15Mgf94Fb7GsxADzDGHctFYfn7wtSbeMhk3qxslknKlUANHOPEJYc/ad9SyYvGNvYypd2PWmXt7Sb3yhCq2e1Zxg9jdhF13XafIKsaDKolmp4uVI9E9rdElANVoGKukw3kYpKC4KRbr/UeGHRLCu49TcJVoRHZKjuKCUIVuM/+LcTeUdC9+UgWXr1agvfgX6E2yFYmih50tfJqzBYEqorOf4=
-  file: resource-resolver.phar
   on:
     repo: bhoogter/resource-resolver
+    tags: true
