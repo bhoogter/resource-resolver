@@ -28,6 +28,7 @@ class resource_resolver
 
         self::add_location("content");
         self::add_location("html");
+        self::add_location("images");
         self::add_location("system");
         self::add_location("css");
         self::add_location("scripts");
