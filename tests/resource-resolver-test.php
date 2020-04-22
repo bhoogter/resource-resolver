@@ -8,6 +8,8 @@ class resource_resolver_tests extends TestCase
 {
 	public static function setUpBeforeClass(): void
 	{
+        require_once(__DIR__ . "/test_logger.php");
+        php_logger::$on = false;
 		resource_resolver::instance()->init(
 			__DIR__ . "/resources/content",
 			realpath(__DIR__ . "/resources")
@@ -81,5 +83,23 @@ class resource_resolver_tests extends TestCase
 			"/content/templates/main/style.css",
 			$this->ref("style.css", "template", "main")
 		);
-	}
+    }
+
+    public function testRootedPath(): void 
+    {
+        $path = "/content/templates/main/images/logo-1.jpg";
+        $this->assertEquals(
+            $path,
+            $this->ref($path)
+        );
+    }
+
+    public function testRootedPattern(): void 
+    {
+        $path = "/content/templates/main/images/logo-*.jpg";
+        $this->assertEquals(
+            7,
+            count($this->files($path))
+        );
+    }
 }

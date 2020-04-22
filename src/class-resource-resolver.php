@@ -56,6 +56,11 @@ class resource_resolver
         if (class_exists("php_logger")) php_logger::log("CALL ($resource)", $types, $mappings, $subfolders);
         if (!is_array($this->locations)) $this->init();
 
+        if (substr($resource, 0, 1) == '/') {
+            if (class_exists("php_logger")) php_logger::trace("Absolute path: ".$this->http_root . $resource);
+            return glob($this->http_root . $resource);
+        }
+
         if (is_string($types) && is_string($mappings)) {
             $mappings = [$types => $mappings];
             $types = [$types];
