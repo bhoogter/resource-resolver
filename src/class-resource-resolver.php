@@ -57,7 +57,7 @@ class resource_resolver
         if (!is_array($this->locations)) $this->init();
 
         if (substr($resource, 0, 1) == '/') {
-            if (class_exists("php_logger")) php_logger::trace("Absolute path: ".$this->http_root . $resource);
+            if (class_exists("php_logger")) php_logger::trace("Absolute path: " . $this->http_root . $resource);
             return glob($this->http_root . $resource);
         }
 
@@ -102,6 +102,16 @@ class resource_resolver
         if (class_exists("php_logger")) php_logger::log("CALL ($resource)", $types, $mappings, $subfolders);
         $res = $this->resolve_files($resource, $types, $mappings, $subfolders);
         return count($res) > 0 ? $res[0] : null;
+    }
+
+    public function resolve_refs($resource, $types = [], $mappings = [], $subfolders = ['.', '*'])
+    {
+        $files = $this->resolve_files($resource, $types, $mappings, $subfolders);
+        foreach ($files as $k=>$f) {
+            $files[$k] = str_replace($this->http_root, "", $files[$k]);
+            $files[$k] = str_replace("\\", "/", $files[$k]);
+        }
+        return $files;
     }
 
     public function resolve_ref($resource, $types = [], $mappings = [], $subfolders = ['.', '*'])
