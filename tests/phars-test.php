@@ -23,6 +23,7 @@ class phars_test extends TestCase
     }
     
     public function testResolvePharFile() {
+        php_logger::$on = true;
         $result = self::$subject->resolve_files("template.xml", "template", "test-phar-1");
         $this->assertTrue(false !== strpos($result[0], "test-phar-1.phar"));
         $this->assertTrue(false !== strpos($result[0], "template.xml"));
