@@ -11,21 +11,27 @@ class resource_resolver
         return $value;
     }
 
+    public static $phurl_types = [ 'css', 'js', 'jpg', 'png', 'gif', 'bmp', 'ico', 'txt' ];
     public $http_root;
-    protected $resource_root;
+    public $resource_root;
     protected $locations;
     protected $phars;
 
     public function init($resource_root = "", $http_root = "")
     {
         if (class_exists("php_logger")) php_logger::log("CALL ($resource_root, $http_root)");
-        if ($http_root != "") $this->http_root = $http_root;
-        if ($this->http_root == "") $this->http_root = realpath(dirname(__DIR__));
+
+        if ($resource_root != "") $this->resource_root = realpath($resource_root);
+        else $this->resource_root = realpath($this->resource_root = __DIR__ . "/content");
+
+        if ($http_root != "") $this->http_root = realpath($http_root);
+        if ($this->http_root == "") $this->http_root = realpath(dirname($this->resource_root));
+
+        $this->resource_root = str_replace("\\", "/", $this->resource_root);
+        $this->http_root = str_replace("\\", "/", $this->http_root);
+
         $this->locations = [];
         $this->phars = [];
-
-        if ($resource_root == "") $this->resource_root = __DIR__ . "/content";
-        else $this->resource_root = $resource_root;
 
         self::add_location("content");
         self::add_location("html");
@@ -98,6 +104,12 @@ class resource_resolver
         return $this->phars[$p][0];
     }
 
+    public function get_phar_by_alias($alias) 
+    {
+        foreach($this->phars as $p) if ($p[0] == $alias) return $p[1];
+        return null;
+    }
+
     public function get_phar_ref($p) { return "phar://" . $this->get_phar_alias(); }
 
     public function resolve_files($resource, $types = [], $mappings = [], $subfolders = ['.', '*'])
@@ -160,7 +172,9 @@ class resource_resolver
                     $file = str_replace("\\", "/", $file);
                     php_logger::dump("Check " . substr($file, -25) . ": ". (preg_match($pattern, $file) ? "YES" : "no"));
                     if (!preg_match($pattern, $file)) continue;
-                    $res[] = $file;
+                    $phurl = str_replace('phar://', '', $file);
+                    $phurl = str_replace($this->http_root, '', $phurl);
+                    $res[] = $phurl;
                 }   
             }
         }
@@ -187,8 +201,8 @@ class resource_resolver
     {
         $files = $this->resolve_files($resource, $types, $mappings, $subfolders);
         foreach ($files as $k => $f) {
-            $files[$k] = str_replace($this->http_root, "", $files[$k]);
             $files[$k] = str_replace("\\", "/", $files[$k]);
+            $files[$k] = str_replace($this->http_root, "", $files[$k]);
         }
         return $files;
     }
@@ -197,44 +211,64 @@ class resource_resolver
     {
         if (class_exists("php_logger")) php_logger::log("CALL ($resource)", $types, $mappings, $subfolders);
         $filename = $this->resolve_file($resource, $types, $mappings, $subfolders);
-        $result = str_replace($this->http_root, "", $filename);
+        $result = $filename;
         $result = str_replace("\\", "/", $result);
+        $result = str_replace($this->http_root, "", $result);
         return $result;
     }
 
-    public function script_type($filename)
+    public function is_phurl($url) { return preg_match("/^\/[a-z0-9-.]*\.phar\/.*/i", $url) !== false; }
+    public function phurl_type($url) { return ($y = strrpos($url, '.')) === false ? '' : strtolower(substr($url, $y + 1)); }
+    public function phurl_file($url) { return realpath($this->http_root . "/" . substr($url, 0, strpos($url, ".phar/") + 5)); }
+    public function phurl_path($url) { return substr($url, strpos($url, ".phar/") + 5); }
+    public function is_phurl_type($type) { return in_array($type, self::$phurl_types); }
+
+    public function phurl($url)
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($filename)");
-        $x = strrpos($filename, ".");
-        if ($x === false) return "text/javascript";
-        switch (strtolower(substr($filename, $x + 1, 1))) {
-            case 'j':
-                return 'text/javascript';
-            case 'v':
-                return 'text/vbscript';
-            default:
-                return 'text/javascript';
-        }
+        if (!self::is_phurl($url)) return false;
+        if (class_exists("php_logger")) php_logger::log("CALL ($url)");
+        if (substr($url, 0, 1) == '/') $url = substr($url, 1);
+        
+        $type = self::phurl_type($url);
+
+        if (!($file = $this->phurl_file($url))) return null;
+        if (!$this->is_phurl_type($type = $this->phurl_type($url))) return null;
+        $path = $this->phurl_path($url);
+        if (class_exists("php_logger")) php_logger::debug("type=$type, file=$file, path=$path");
+        
+        @header('Content-Type: ' . self::content_type($file));
+        
+        $read_target = "phar://" . $file . $path;
+        if (class_exists("php_logger")) php_logger::log("read target=$read_target");
+        $fp = fopen($read_target, 'rb');
+        echo stream_get_contents($fp);
+        fclose($fp);
+        return true;
     }
 
-    public function image_format($filename)
+    public function content_type($ext)
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($filename)");
-        $x = strrpos($filename, ".");
-        if ($x === false) return "image/ico";
-        $t = substr($filename, $x);
-        switch (strtolower(substr($t, 0, 4))) {
-            case ".ico":
-                return "image/ico";
-            case ".png":
-                return "image/png";
-            case ".jpg":
-            case ".jpe":
-                return "image/jpeg";
-            case ".gif":
-                return "image/gif";
-            default:
-                return "image/bmp";
+        switch(strtolower($ext))
+        {
+            case 'jpg': return "image/jpg";
+            case 'bmp': return "image/bmp";
+            case 'gif': return "image/gif";
+            case 'png': return "image/png";
+
+            case 'ico': return "image/ico";
+
+            case 'txt': return "text/plain";
+
+            case 'htm': return "text/html";
+            case 'html': return "text/html";
+            case 'xhtml': return "text/xhtml";
+
+            case 'css': return "text/stylesheet";
+
+            case 'js': return "text/javascript";
+
+            case 'xml': return "text/xml";
+            case 'xsl': return "text/xml";
         }
     }
 }
