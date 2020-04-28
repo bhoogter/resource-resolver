@@ -217,7 +217,7 @@ class resource_resolver
         return $result;
     }
 
-    public function is_phurl($url) { return preg_match("/^\/[a-z0-9-.]*\.phar\/.*/i", $url) !== false; }
+    public function is_phurl($url) { return preg_match("/^\/[a-z0-9-.]*\.phar\/.*/i", $url) !== false && false === strpos($url, ".."); }
     public function phurl_type($url) { return ($y = strrpos($url, '.')) === false ? '' : strtolower(substr($url, $y + 1)); }
     public function phurl_file($url) { return realpath($this->http_root . "/" . substr($url, 0, strpos($url, ".phar/") + 5)); }
     public function phurl_path($url) { return substr($url, strpos($url, ".phar/") + 5); }
