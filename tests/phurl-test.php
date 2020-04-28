@@ -2,7 +2,7 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
-class phars_test extends TestCase
+class phurl_test extends TestCase
 {
     const TESTCASE1 = "/content/templates/test-phar-1.phar/src/logo-1.jpg";
     public static $subject;
