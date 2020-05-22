@@ -130,6 +130,8 @@ class resource_resolver
         if (is_string($types)) $types = [$types];
         if (is_string($subfolders)) $subfolders = [$subfolders];
 
+        if ($types == null) $types = [];
+        if ($mappings == null) $mappings = [];
         $types += ['.', 'html'];
 
         if (class_exists("php_logger")) php_logger::trace("Types=", $types);
@@ -248,27 +250,32 @@ class resource_resolver
 
     public function content_type($ext)
     {
+        if (class_exists("php_logger")) php_logger::log("CALL ($ext)");
         switch(strtolower($ext))
         {
-            case 'jpg': return "image/jpg";
-            case 'bmp': return "image/bmp";
-            case 'gif': return "image/gif";
-            case 'png': return "image/png";
+            case 'jpg': $r = "image/jpg";
+            case 'bmp': $r = "image/bmp";
+            case 'gif': $r = "image/gif";
+            case 'png': $r = "image/png";
 
-            case 'ico': return "image/ico";
+            case 'ico': $r = "image/ico";
 
-            case 'txt': return "text/plain";
+            case 'txt': $r = "text/plain";
 
-            case 'htm': return "text/html";
-            case 'html': return "text/html";
-            case 'xhtml': return "text/xhtml";
+            case 'htm': $r = "text/html";
+            case 'html': $r = "text/html";
+            case 'xhtml': $r = "text/xhtml";
 
-            case 'css': return "text/stylesheet";
+            case 'css': $r = "text/stylesheet";
 
-            case 'js': return "text/javascript";
+            case 'js': $r = "text/javascript";
 
-            case 'xml': return "text/xml";
-            case 'xsl': return "text/xml";
+            case 'xml': $r = "text/xml";
+            case 'xsl': $r = "text/xml";
+
+            default: $r = "application/octet-stream";
         }
+        if (class_exists("php_logger")) php_logger::log("RESULT [$ext] - $r");
+        return $r;
     }
 }
