@@ -266,7 +266,7 @@ class resource_resolver
             case 'html': $r = "text/html"; break;
             case 'xhtml': $r = "text/xhtml"; break;
 
-            case 'css': $r = "text/stylesheet"; break;
+            case 'css': $r = "text/css"; break;
 
             case 'js': $r = "text/javascript"; break;
 
