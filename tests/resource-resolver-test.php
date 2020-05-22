@@ -106,7 +106,7 @@ class resource_resolver_tests extends TestCase
     public function testContentType(): void
     {
         $this->assertEquals('text/javascript', resource_resolver::instance()->content_type('js'));
-        $this->assertEquals('text/stylesheet', resource_resolver::instance()->content_type('css'));
+        $this->assertEquals('text/css', resource_resolver::instance()->content_type('css'));
         $this->assertEquals('application/octet-stream', resource_resolver::instance()->content_type('unknown'));
     }
 }
