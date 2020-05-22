@@ -253,27 +253,27 @@ class resource_resolver
         if (class_exists("php_logger")) php_logger::log("CALL ($ext)");
         switch(strtolower($ext))
         {
-            case 'jpg': $r = "image/jpg";
-            case 'bmp': $r = "image/bmp";
-            case 'gif': $r = "image/gif";
-            case 'png': $r = "image/png";
+            case 'jpg': $r = "image/jpg"; break;
+            case 'bmp': $r = "image/bmp"; break;
+            case 'gif': $r = "image/gif"; break;
+            case 'png': $r = "image/png"; break;
 
-            case 'ico': $r = "image/ico";
+            case 'ico': $r = "image/ico"; break;
 
-            case 'txt': $r = "text/plain";
+            case 'txt': $r = "text/plain"; break;
 
-            case 'htm': $r = "text/html";
-            case 'html': $r = "text/html";
-            case 'xhtml': $r = "text/xhtml";
+            case 'htm': $r = "text/html"; break;
+            case 'html': $r = "text/html"; break;
+            case 'xhtml': $r = "text/xhtml"; break;
 
-            case 'css': $r = "text/stylesheet";
+            case 'css': $r = "text/stylesheet"; break;
 
-            case 'js': $r = "text/javascript";
+            case 'js': $r = "text/javascript"; break;
 
-            case 'xml': $r = "text/xml";
-            case 'xsl': $r = "text/xml";
+            case 'xml': $r = "text/xml"; break;
+            case 'xsl': $r = "text/xml"; break;
 
-            default: $r = "application/octet-stream";
+            default: $r = "application/octet-stream"; break;
         }
         if (class_exists("php_logger")) php_logger::log("RESULT [$ext] - $r");
         return $r;
