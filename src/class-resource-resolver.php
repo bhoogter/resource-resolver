@@ -23,7 +23,7 @@ class resource_resolver
     private static function dump(...$msg) { self::log("DUMP", ...$msg); }
     private static function log(...$msg) {
         static $exists;
-        if (!isset($exists)) $exists = class_exists("php_logger");
+        if (!isset($exists)) $exists = class_exists("php_logger", false);
         if ($exists) php_logger::log(...$msg);
     }
 
