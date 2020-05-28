@@ -20,6 +20,7 @@ class resource_resolver
 
     private static function debug(...$msg) { self::log("DEBUG", ...$msg); }
     private static function trace(...$msg) { self::log("TRACE", ...$msg); }
+    private static function dump(...$msg) { self::log("DUMP", ...$msg); }
     private static function log(...$msg) {
         static $exists;
         if (!isset($exists)) $exists = class_exists("php_logger");
