@@ -4,19 +4,26 @@ use PHPUnit\Framework\TestCase;
 
 class phars_test extends TestCase
 {
+    private const CONTENT_FOLDER = __DIR__ . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . "content";
+    private const TEMPLATES_FOLDER = self::CONTENT_FOLDER . DIRECTORY_SEPARATOR . "templates";
+
     private static $subject;
 
 	public static function setUpBeforeClass(): void
 	{
         require_once(__DIR__ . "/test_logger.php");
         php_logger::$on = false;
-		resource_resolver::instance()->init(__DIR__ . "/resources/content");
+		resource_resolver::instance()->init(self::CONTENT_FOLDER);
         self::$subject = resource_resolver::instance();
     }
     
     public function testAvailablePhars() {
-        $result = self::$subject->available_phars(__DIR__ . "/resources/content/templates");
+        $result = self::$subject->available_phars(self::TEMPLATES_FOLDER);
+        print_r($result);
         $this->assertTrue(0 < count($result));
+        $this->assertTrue(false !== strpos($result[0], __DIR__));
+        $this->assertTrue(false !== strpos($result[0], self::TEMPLATES_FOLDER));
+        $this->assertTrue(false !== strpos($result[0], "test-phar-1.phar"));
     }
     
     public function testResolvePharFile() {

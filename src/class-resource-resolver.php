@@ -2,6 +2,7 @@
 
 class resource_resolver
 {
+    private const S = DIRECTORY_SEPARATOR;
     // This is settable from anywhere (allows overriding)
     public static $instance;
     public static function instance($resource_root = "")
@@ -17,49 +18,54 @@ class resource_resolver
     protected $locations;
     protected $phars;
 
+    private static function debug(...$msg) { self::log("DEBUG", ...$msg); }
+    private static function trace(...$msg) { self::log("TRACE", ...$msg); }
+    private static function log(...$msg) {
+        static $exists;
+        if (!isset($exists)) $exists = class_exists("php_logger");
+        if ($exists) php_logger::log(...$msg);
+    }
+
     public function init($resource_root = "", $http_root = "")
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($resource_root, $http_root)");
+        self::log("CALL ($resource_root, $http_root)");
 
         if ($resource_root != "") $this->resource_root = realpath($resource_root);
-        else $this->resource_root = realpath($this->resource_root = __DIR__ . "/content");
+        else $this->resource_root = realpath($this->resource_root = __DIR__ . self::S . "content");
 
         if ($http_root != "") $this->http_root = realpath($http_root);
         if ($this->http_root == "") $this->http_root = realpath(dirname($this->resource_root));
 
-        $this->resource_root = str_replace("\\", "/", $this->resource_root);
-        $this->http_root = str_replace("\\", "/", $this->http_root);
-
         $this->locations = [];
         $this->phars = [];
 
-        self::add_location("content");
-        self::add_location("html");
-        self::add_location("images");
-        self::add_location("system");
-        self::add_location("css");
-        self::add_location("scripts");
-        self::add_location("template", "templates/@@");
-        self::add_location("module", "modules/@@");
+        $this->add_location("content");
+        $this->add_location("html");
+        $this->add_location("images");
+        $this->add_location("system");
+        $this->add_location("css");
+        $this->add_location("scripts");
+        $this->add_location("template", "templates" . self::S . "@@");
+        $this->add_location("module", "modules" . self::S . "@@");
     }
 
     public function get_locations()
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($name, $loc)");
+        self::log("CALL");
         if (!is_array($this->locations)) $this->init();
         return $this->locations;
     }
 
     public function get_location($name)
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($name, $loc)");
+        self::log("CALL");
         if (!is_array($this->locations)) $this->init();
         return @$this->locations[$name];
     }
 
     public function add_location($name, $loc = "")
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($name, $loc)");
+        self::log("CALL ($name, $loc)");
         if (!is_array($this->locations)) $this->init();
         if ($loc == "") $loc = $name;
         $this->locations[$name] = $loc;
@@ -67,16 +73,23 @@ class resource_resolver
 
     public function remove_location($name)
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($name)");
+        self::log("CALL ($name)");
         if (!is_array($this->locations)) $this->init();
         unset($this->locations[$name]);
     }
 
-    public function available_phars($folder)
+    public function available_phars($dir)
     {
-        $fnd = strpos($folder, ".phar") === false ? "$folder/*.phar" : $folder;
-        $src = glob($fnd);
-        $src = array_map("realpath", $src);
+        if (substr($dir, -5) == '.phar') {
+            if (!file_exists($dir)) return [];
+            return [$dir];
+        }
+        $src = [];
+
+        // print "\ndir=$dir";
+        if(($dh = opendir($dir)) !== null) while (($file = readdir($dh)) !== false)
+            if (substr($file, -5) == '.phar') $src[] = $dir . self::S . $file;
+        closedir($dh);
         return $src;
     }
 
@@ -110,16 +123,26 @@ class resource_resolver
         return null;
     }
 
-    public function get_phar_ref($p) { return "phar://" . $this->get_phar_alias(); }
+    public function get_phar_ref($p) { return "phar://" . $this->get_phar_alias($p); }
 
-    public function resolve_files($resource, $types = [], $mappings = [], $subfolders = ['.', '*'])
+    private function regex_glob($s) {
+        $s = str_replace(".", "\\.", $s);
+        $s = str_replace("?", ".", $s);
+        $s = str_replace("*", ".*", $s);
+        $s = str_replace("/", "\\/", $s);
+        $s = "/$s$/";
+
+        return $s;
+    }
+
+    public function resolve_files($resource, $types = [], $mappings = [], $subfolders = [])
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($resource)", $types, $mappings, $subfolders);
+        self::log("resolve_files CALL ($resource)", $types, $mappings, $subfolders);
         if (!is_array($this->locations)) $this->init();
 
         if (substr($resource, 0, 1) == '/') {
             $path = $this->http_root . $resource;
-            if (class_exists("php_logger")) php_logger::trace("Absolute path: $path");
+            self::trace("Absolute path: $path");
             return glob($path);
         }
 
@@ -132,40 +155,36 @@ class resource_resolver
 
         if ($types == null) $types = [];
         if ($mappings == null) $mappings = [];
-        $types += ['.', 'html'];
+        $types += ['', 'html'];
 
-        if (class_exists("php_logger")) php_logger::trace("Types=", $types);
+        self::trace("Types=", $types);
         $res = [];
         foreach ($types as $type) {
-            if (class_exists("php_logger")) php_logger::trace("type=$type, res=", $res);
+            self::trace("type=$type, res=", $res);
             $type_loc_src = !!isset($this->locations[$type]) ? $this->locations[$type] : $type;
-            if (class_exists("php_logger")) php_logger::trace("typeloc=$type_loc_src");
+            self::trace("typeloc=$type_loc_src");
             $type_loc = str_replace("@@", isset($mappings[$type]) ? $mappings[$type] : '', $type_loc_src);
 
             // TODO: Other Mappings...
-            $loc_src = $this->resource_root . "/" . $type_loc;
-            $loc = realpath($loc_src);
-            if ($loc) {
-                if (class_exists("php_logger")) php_logger::trace("loc: $loc");
+            $loc = $this->resource_root . ($type_loc == '' ? '' : (self::S . $type_loc));
+            self::trace("loc: $loc");
 
-                foreach ($subfolders as $subfolder) {
-                    $subloc = "$loc/$subfolder";
-                    $pattern = "$subloc/$resource";
-                    if (class_exists("php_logger")) php_logger::trace("matching pattern: $pattern");
-                    $res = array_merge($res, glob($pattern));
-                }
+            if (!in_array('', $subfolders)) array_unshift($subfolders, '');
+            $pattern = $this->regex_glob($resource);
+            self::debug("SUBFOLDERS", $subfolders);
+            foreach ($subfolders as $subfolder) {
+                $subloc = "$loc".(!!$subfolder ? self::S."$subfolder" : '');
+                self::trace("matching pattern: subloc=$subloc, pattern=$pattern");
+
+                if (is_dir($subloc))
+                    if(($dh = opendir($subloc)) !== null) while (($file = readdir($dh)) !== false)
+                        if (preg_match($pattern, $file)) $res[] = $subloc . self::S . $file;
             }
 
-            $pharfnd = strpos($type_loc_src, '@@') === false ? $loc : $loc_src . ".phar";
+            $pharfnd = strpos($type_loc_src, '@@') === false ? $loc : $loc . ".phar";
             $phars = $this->available_phars($pharfnd);
-            if (class_exists("php_logger")) php_logger::log("Scanning for PHARs at: $pharfnd");
-            if (class_exists("php_logger")) php_logger::trace("Phars Available: ".print_r($phars, true));
-            $pattern = $resource;
-            $pattern = str_replace(".", "\\.", $pattern);
-            $pattern = str_replace("?", ".", $pattern);
-            $pattern = str_replace("*", ".*", $pattern);
-            $pattern = str_replace("/", "\\/", $pattern);
-            $pattern = "/$pattern$/";
+            self::log("Scanning for PHARs at: $pharfnd");
+            self::trace("Phars Available: ".print_r($phars, true));
             php_logger::debug("pattern=$pattern");
             foreach ($phars as $p) {
                 $pharselect = isset($mappings['phar']) ? $mappings['phar'] : null;
@@ -177,45 +196,40 @@ class resource_resolver
                     $phurl = str_replace('phar://', '', $file);
                     $phurl = str_replace($this->http_root, '', $phurl);
                     $res[] = $phurl;
-                }   
+                }
             }
         }
 
-        for ($i = 0; $i < count($res); $i++) {
-            $a = str_replace("\\", "/", $res[$i]);
-            $b = realpath($a); // fails for phars
-            $res[$i] = $b ? $b : $a;
-        }
-
-        $num = count($res);
-        if (class_exists("php_logger")) php_logger::debug("RESULT: ", $res);
+        self::debug("RESULT: ", $res);
         return $res;
     }
 
-    public function resolve_file($resource, $types = [], $mappings = [], $subfolders = ['.', '*'])
+    public function resolve_file($resource, $types = [], $mappings = [], $subfolders = [])
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($resource)", $types, $mappings, $subfolders);
+        self::log("resolve_file CALL ($resource)", $types, $mappings, $subfolders);
         $res = $this->resolve_files($resource, $types, $mappings, $subfolders);
         return count($res) > 0 ? $res[0] : null;
     }
 
-    public function resolve_refs($resource, $types = [], $mappings = [], $subfolders = ['.', '*'])
+    public function resolve_refs($resource, $types = [], $mappings = [], $subfolders = [])
     {
         $files = $this->resolve_files($resource, $types, $mappings, $subfolders);
+        $t = str_replace("\\", "/", $this->http_root);
         foreach ($files as $k => $f) {
             $files[$k] = str_replace("\\", "/", $files[$k]);
-            $files[$k] = str_replace($this->http_root, "", $files[$k]);
+            $files[$k] = str_replace($t, "", $files[$k]);
         }
         return $files;
     }
 
-    public function resolve_ref($resource, $types = [], $mappings = [], $subfolders = ['.', '*'])
+    public function resolve_ref($resource, $types = [], $mappings = [], $subfolders = [])
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($resource)", $types, $mappings, $subfolders);
+        self::log("CALL ($resource)", $types, $mappings, $subfolders);
         $filename = $this->resolve_file($resource, $types, $mappings, $subfolders);
         $result = $filename;
         $result = str_replace("\\", "/", $result);
-        $result = str_replace($this->http_root, "", $result);
+        $t = str_replace("\\", "/", $this->http_root);
+        $result = str_replace($t, "", $result);
         return $result;
     }
 
@@ -228,7 +242,7 @@ class resource_resolver
     public function phurl($url)
     {
         if (!self::is_phurl($url)) return false;
-        if (class_exists("php_logger")) php_logger::log("CALL ($url)");
+        self::log("CALL ($url)");
         if (substr($url, 0, 1) == '/') $url = substr($url, 1);
         
         $type = self::phurl_type($url);
@@ -236,12 +250,12 @@ class resource_resolver
         if (!($file = $this->phurl_file($url))) return null;
         if (!$this->is_phurl_type($type = $this->phurl_type($url))) return null;
         $path = $this->phurl_path($url);
-        if (class_exists("php_logger")) php_logger::debug("type=$type, file=$file, path=$path");
+        self::debug("type=$type, file=$file, path=$path");
         
         @header('Content-Type: ' . self::content_type($file));
         
         $read_target = "phar://" . $file . $path;
-        if (class_exists("php_logger")) php_logger::log("read target=$read_target");
+        self::log("read target=$read_target");
         $fp = fopen($read_target, 'rb');
         echo stream_get_contents($fp);
         fclose($fp);
@@ -250,7 +264,7 @@ class resource_resolver
 
     public function content_type($ext)
     {
-        if (class_exists("php_logger")) php_logger::log("CALL ($ext)");
+        self::log("CALL ($ext)");
         switch(strtolower($ext))
         {
             case 'jpg': $r = "image/jpg"; break;
@@ -275,7 +289,7 @@ class resource_resolver
 
             default: $r = "application/octet-stream"; break;
         }
-        if (class_exists("php_logger")) php_logger::log("RESULT [$ext] - $r");
+        self::log("RESULT [$ext] - $r");
         return $r;
     }
 }
