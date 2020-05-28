@@ -185,13 +185,13 @@ class resource_resolver
             $phars = $this->available_phars($pharfnd);
             self::log("Scanning for PHARs at: $pharfnd");
             self::trace("Phars Available: ".print_r($phars, true));
-            php_logger::debug("pattern=$pattern");
+            self::debug("pattern=$pattern");
             foreach ($phars as $p) {
                 $pharselect = isset($mappings['phar']) ? $mappings['phar'] : null;
                 if ($pharselect && basename($p) != $pharselect) continue;
                 foreach (new RecursiveIteratorIterator($this->get_phar($p)) as $file) {
                     $file = str_replace("\\", "/", $file);
-                    php_logger::dump("Check " . substr($file, -25) . ": ". (preg_match($pattern, $file) ? "YES" : "no"));
+                    self::dump("Check " . substr($file, -25) . ": ". (preg_match($pattern, $file) ? "YES" : "no"));
                     if (!preg_match($pattern, $file)) continue;
                     $phurl = str_replace('phar://', '', $file);
                     $phurl = str_replace($this->http_root, '', $phurl);
