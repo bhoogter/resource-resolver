@@ -18,18 +18,21 @@ class resource_resolver
     protected $locations;
     protected $phars;
 
-    private static function debug(...$msg) { self::log("DEBUG", ...$msg); }
-    private static function trace(...$msg) { self::log("TRACE", ...$msg); }
-    private static function dump(...$msg) { self::log("DUMP", ...$msg); }
-    private static function log(...$msg) {
-        static $exists;
-        if (!isset($exists)) $exists = class_exists("php_logger", false);
-        if ($exists) php_logger::log(...$msg);
+    private static function has_logger() {
+        static $x;
+        if (!$x) $x = class_exists('php_logger', false) ? 1 : -1;
+        return $x > 0;
     }
+
+    private static function call(...$msg) { if (self::has_logger()) php_logger::call(...$msg); }
+    private static function log(...$msg) { if (self::has_logger()) php_logger::log(...$msg); }
+    private static function debug(...$msg) { if (self::has_logger()) php_logger::debug(...$msg); }
+    private static function trace(...$msg) { if (self::has_logger()) php_logger::trace(...$msg); }
+    private static function dump(...$msg) { if (self::has_logger()) php_logger::dump(...$msg); }
 
     public function init($resource_root = "", $http_root = "")
     {
-        self::log("CALL ($resource_root, $http_root)");
+        self::call();
 
         if ($resource_root != "") $this->resource_root = realpath($resource_root);
         else $this->resource_root = realpath($this->resource_root = __DIR__ . self::S . "content");
@@ -52,21 +55,21 @@ class resource_resolver
 
     public function get_locations()
     {
-        self::log("CALL");
+        self::call();
         if (!is_array($this->locations)) $this->init();
         return $this->locations;
     }
 
     public function get_location($name)
     {
-        self::log("CALL");
+        self::call();
         if (!is_array($this->locations)) $this->init();
         return @$this->locations[$name];
     }
 
     public function add_location($name, $loc = "")
     {
-        self::log("CALL ($name, $loc)");
+        self::call("CALL ($name, $loc)");
         if (!is_array($this->locations)) $this->init();
         if ($loc == "") $loc = $name;
         $this->locations[$name] = $loc;
@@ -74,7 +77,7 @@ class resource_resolver
 
     public function remove_location($name)
     {
-        self::log("CALL ($name)");
+        self::call("CALL ($name)");
         if (!is_array($this->locations)) $this->init();
         unset($this->locations[$name]);
     }
@@ -138,7 +141,7 @@ class resource_resolver
 
     public function resolve_files($resource, $types = [], $mappings = [], $subfolders = [])
     {
-        self::log("resolve_files CALL ($resource)", $types, $mappings, $subfolders);
+        self::call("resolve_files CALL ($resource)", $types, $mappings, $subfolders);
         if (!is_array($this->locations)) $this->init();
 
         if (substr($resource, 0, 1) == '/') {
@@ -207,7 +210,7 @@ class resource_resolver
 
     public function resolve_file($resource, $types = [], $mappings = [], $subfolders = [])
     {
-        self::log("resolve_file CALL ($resource)", $types, $mappings, $subfolders);
+        self::call("resolve_file CALL ($resource)", $types, $mappings, $subfolders);
         $res = $this->resolve_files($resource, $types, $mappings, $subfolders);
         return count($res) > 0 ? $res[0] : null;
     }
@@ -225,7 +228,7 @@ class resource_resolver
 
     public function resolve_ref($resource, $types = [], $mappings = [], $subfolders = [])
     {
-        self::log("CALL ($resource)", $types, $mappings, $subfolders);
+        self::call("CALL ($resource)", $types, $mappings, $subfolders);
         $filename = $this->resolve_file($resource, $types, $mappings, $subfolders);
         $result = $filename;
         $result = str_replace("\\", "/", $result);
