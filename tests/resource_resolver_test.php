@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 
-class resource_resolver_tests extends TestCase
+class resource_resolver_test extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
@@ -62,7 +62,7 @@ class resource_resolver_tests extends TestCase
         $this->assertTrue($this->fileFound("about-content.html"));
         $this->assertFalse($this->fileFound("does-not-exist.html"));
     }
-
+    
     public function testResolveTemplateXml(): void
     {
         $this->assertTrue($this->fileFound("template.xml", "template", "main", [], "name='Forest'"));
@@ -109,5 +109,10 @@ class resource_resolver_tests extends TestCase
         $this->assertEquals('text/javascript', resource_resolver::instance()->content_type('js'));
         $this->assertEquals('text/css', resource_resolver::instance()->content_type('css'));
         $this->assertEquals('application/octet-stream', resource_resolver::instance()->content_type('unknown'));
+    }
+
+    public function testdetectSubFolder(): void
+    {
+        $this->assertEquals(1, $this->filesFound("subf/css.css", "css"));
     }
 }

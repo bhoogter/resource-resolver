@@ -130,6 +130,7 @@ class resource_resolver
     public function get_phar_ref($p) { return "phar://" . $this->get_phar_alias($p); }
 
     private function regex_glob($s) {
+        if (false == strpos($s, "?") && false == strpos($s, "*")) return null;
         $s = str_replace(".", "\\.", $s);
         $s = str_replace("?", ".", $s);
         $s = str_replace("*", ".*", $s);
@@ -180,9 +181,14 @@ class resource_resolver
                 $subloc = "$loc".(!!$subfolder ? self::S."$subfolder" : '');
                 self::trace("matching pattern: subloc=$subloc, pattern=$pattern");
 
-                if (is_dir($subloc))
-                    if(($dh = opendir($subloc)) !== null) while (($file = readdir($dh)) !== false)
-                        if (preg_match($pattern, $file)) $res[] = $subloc . self::S . $file;
+                if ($pattern == null) {
+                    if (file_exists($file = $subloc . self::S . str_replace('/', self::S, $resource)))
+                        $res[] = $file;
+                } else {
+                    if (is_dir($subloc))
+                        if(($dh = opendir($subloc)) !== null) while (($file = readdir($dh)) !== false)
+                            if (preg_match($pattern, $file)) $res[] = $subloc . self::S . $file;
+                }
             }
 
             $pharfnd = strpos($type_loc_src, '@@') === false ? $loc : $loc . ".phar";
