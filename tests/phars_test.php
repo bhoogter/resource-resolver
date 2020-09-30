@@ -55,4 +55,22 @@ class phars_test extends TestCase
         // php_logger::log("result=$result");
         $this->assertEquals("/content/templates/test-phar-1.phar/src/logo-1.jpg", $result);
     }
+
+    public function testResolvePharImageRefAlreadyRef() {
+        php_logger::$on = true;
+        $result = self::$subject->resolve_ref("/content/templates/test-phar-1.phar/src/logo-1.jpg", "template", "test-phar-1");
+        // php_logger::log("resc_root=".self::$subject->resource_root);
+        // php_logger::log("http_root=".self::$subject->http_root);
+        // php_logger::log("result=$result");
+        $this->assertEquals("/content/templates/test-phar-1.phar/src/logo-1.jpg", $result);
+    }
+
+    // public function testResolvePharImageRefAlreadyRefMulti() {
+    //     php_logger::$on = true;
+    //     $result = self::$subject->resolve_ref("/content/templates/test-phar-1.phar/src/logo-*.jpg", "template", "test-phar-1");
+    //     // php_logger::log("resc_root=".self::$subject->resource_root);
+    //     // php_logger::log("http_root=".self::$subject->http_root);
+    //     // php_logger::log("result=$result");
+    //     $this->assertEquals("/content/templates/test-phar-1.phar/src/logo-1.jpg", $result);
+    // }
 }

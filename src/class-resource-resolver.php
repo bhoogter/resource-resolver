@@ -149,6 +149,11 @@ class resource_resolver
         if (substr($resource, 0, 1) == '/') {
             $path = $this->http_root . $resource;
             self::trace("Absolute path: $path");
+            if (false !== strpos($resource, ".phar")) {
+                if (false !== strpos($resource, "?") || false !== strpos($resource, "*"))
+                    throw new Exception("Absolute lookups within phars not handled...");
+                return [$path];  // TODO: This wont handle wildcards in phars, but at least handles pre-made specific refs..
+            }
             return glob($path);
         }
 
