@@ -25,6 +25,7 @@ class resource_resolver
     }
 
     private static function call(...$msg) { if (self::has_logger()) php_logger::call(...$msg); }
+    private static function result(...$msg) { if (self::has_logger()) php_logger::result(...$msg); }
     private static function log(...$msg) { if (self::has_logger()) php_logger::log(...$msg); }
     private static function debug(...$msg) { if (self::has_logger()) php_logger::debug(...$msg); }
     private static function trace(...$msg) { if (self::has_logger()) php_logger::trace(...$msg); }
@@ -201,8 +202,13 @@ class resource_resolver
                 if ($pharselect && basename($p) != $pharselect) continue;
                 foreach (new RecursiveIteratorIterator($this->get_phar($p)) as $file) {
                     $file = str_replace("\\", "/", $file);
-                    self::dump("Check " . substr($file, -25) . ": ". (preg_match($pattern, $file) ? "YES" : "no"));
-                    if (!preg_match($pattern, $file)) continue;
+                    if ($pattern == null) {
+                        self::dump("Check " . substr($file, -25) . ": ". (substr($file, -strlen($resource)) === $resource ? "YES" : "no"));
+                        if (substr($file, -strlen($resource)) !== $resource) continue;
+                    } else {
+                      self::dump("Check " . substr($file, -25) . ": ". (preg_match($pattern, $file) ? "YES" : "no"));
+                      if (!preg_match($pattern, $file)) continue;
+                    }
                     $phurl = str_replace('phar://', '', $file);
                     $phurl = str_replace($this->http_root, '', $phurl);
                     $res[] = $phurl;
@@ -210,7 +216,7 @@ class resource_resolver
             }
         }
 
-        self::debug("RESULT: ", $res);
+        self::result($res);
         return $res;
     }
 
@@ -219,6 +225,17 @@ class resource_resolver
         self::call("resolve_file CALL ($resource)", $types, $mappings, $subfolders);
         $res = $this->resolve_files($resource, $types, $mappings, $subfolders);
         return count($res) > 0 ? $res[0] : null;
+    }
+
+    public function ref($file) {
+        $file = str_replace("\\", "/", $file);
+        $t = str_replace("\\", "/", $this->http_root);
+        $file = str_replace($t, "", $file);
+        return $file;
+    }
+
+    public function file($ref) {
+        return $this->http_root . $ref;
     }
 
     public function resolve_refs($resource, $types = [], $mappings = [], $subfolders = [])
@@ -236,11 +253,7 @@ class resource_resolver
     {
         self::call("CALL ($resource)", $types, $mappings, $subfolders);
         $filename = $this->resolve_file($resource, $types, $mappings, $subfolders);
-        $result = $filename;
-        $result = str_replace("\\", "/", $result);
-        $t = str_replace("\\", "/", $this->http_root);
-        $result = str_replace($t, "", $result);
-        return $result;
+        return $this->ref($filename);
     }
 
     public function is_phurl($url) { return preg_match("/^\/[a-z0-9-.]*\.phar\/.*/i", $url) !== false && false === strpos($url, ".."); }

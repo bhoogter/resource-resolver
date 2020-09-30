@@ -15,6 +15,7 @@ class phars_test extends TestCase
         php_logger::$on = false;
 		resource_resolver::instance()->init(self::CONTENT_FOLDER);
         self::$subject = resource_resolver::instance();
+
     }
     
     public function testAvailablePhars() {
