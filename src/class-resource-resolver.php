@@ -208,13 +208,14 @@ class resource_resolver
                 foreach (new RecursiveIteratorIterator($this->get_phar($p)) as $file) {
                     $file = str_replace("\\", "/", $file);
                     if ($pattern == null) {
-                        self::dump("Check " . substr($file, -25) . ": ". (substr($file, -strlen($resource)) === $resource ? "YES" : "no"));
+                        self::dump("Check exact " . substr($file, -25) . ": ". (substr($file, -strlen($resource)) === $resource ? "YES" : "no"));
                         if (substr($file, -strlen($resource)) !== $resource) continue;
                     } else {
-                      self::dump("Check " . substr($file, -25) . ": ". (preg_match($pattern, $file) ? "YES" : "no"));
+                      self::dump("Check pattern " . substr($file, -25) . ": ". (preg_match($pattern, $file) ? "YES" : "no"));
                       if (!preg_match($pattern, $file)) continue;
                     }
-                    $phurl = str_replace('phar://', '', $file);
+                    $phurl = $file;
+                    // $phurl = str_replace('phar://', '', $file);
                     $phurl = str_replace($this->http_root, '', $phurl);
                     $res[] = $phurl;
                 }
@@ -234,6 +235,8 @@ class resource_resolver
 
     public function ref($file) {
         $file = str_replace("\\", "/", $file);
+        $file = str_replace('phar://', '', $file);
+        $t = str_replace("\\", "/", $this->http_root);
         $t = str_replace("\\", "/", $this->http_root);
         $file = str_replace($t, "", $file);
         return $file;
